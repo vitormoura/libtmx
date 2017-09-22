@@ -89,7 +89,59 @@ namespace tmxparser {
 		
 	public:
 		map() {}
-		~map() {}
+		~map() {
+			
+			//TODO: Implementacao logica de limpeza de recursos
+			
+			for (auto og : object_groups) {
+
+				if (og.second->objects != nullptr) {
+
+					for (auto o : *og.second->objects) {
+						
+						if (o->properties != nullptr) {
+
+							for (auto prop : *o->properties) {
+								delete prop;
+							}
+
+							delete o->properties;
+						}
+					}
+
+					delete og.second->objects;
+				}
+
+				delete og.second;
+			}
+
+			for (auto tl : tile_layers) {
+
+				if (tl.second->properties != nullptr) {
+					for (auto prop : *tl.second->properties) {
+						delete prop;
+					}
+
+					delete tl.second->properties;
+				}
+
+				if (tl.second->data != nullptr) {
+					delete tl.second->data;
+				}
+
+				delete tl.second;
+			}
+
+			/*
+			for (auto img : image_layers) {
+				delete img.second;
+			}
+
+			for (auto ts : vector<tileset*> tilesets) {
+				delete ts;
+			}
+			*/
+		}
 
 	public:
 
