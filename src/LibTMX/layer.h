@@ -31,7 +31,7 @@ namespace tmxparser {
 		size_t height;
 
 		//
-		vector<custom_property*>* properties;
+		shared_ptr<vector<shared_ptr<custom_property>>> properties;
 	};
 }
 

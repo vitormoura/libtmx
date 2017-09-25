@@ -16,7 +16,7 @@ namespace tmxparser {
 	public:
 				
 		//Whatever format you choose for your layer data, you will always end up with so called "global tile IDs" (gids). They are global, since they may refer to a tile from any of the tilesets used by the map
-		vector<int>* data;
+		shared_ptr<vector<int>> data;
 	};
 }
 

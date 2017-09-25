@@ -17,11 +17,11 @@ namespace tmxparser {
 		//The type of the tile. Refers to an object type and is used by tile objects
 		string type;
 
-		vector<custom_property*>* properties;
+		shared_ptr<vector<shared_ptr<custom_property>>> properties;
 		
-		object_group* object_group;
+		shared_ptr<object_group> object_group;
 
-		tileset_image* image;
+		shared_ptr<tileset_image> image;
 		
 		//A percentage indicating the probability that this tile is chosen when it competes with others while editing with the terrain tool
 		float probability;

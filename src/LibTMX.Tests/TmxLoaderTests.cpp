@@ -56,13 +56,18 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts->tile_offset.x, 15);
 	ASSERT_EQ(ts->tile_offset.y, 15);
 
-	ASSERT_EQ(ts->image.format, "");
-	ASSERT_EQ(ts->image.width, 256);
-	ASSERT_EQ(ts->image.height, 7199);
-	ASSERT_STREQ(ts->image.transparency_color.c_str(), "FF00FF");
-	ASSERT_EQ(ts->image.source, "lab_tilemap_001.png");
+	ASSERT_EQ(ts->image->format, "");
+	ASSERT_EQ(ts->image->width, 256);
+	ASSERT_EQ(ts->image->height, 7199);
+	ASSERT_STREQ(ts->image->transparency_color.c_str(), "FF00FF");
+	ASSERT_EQ(ts->image->source, "lab_tilemap_001.png");
 
-	ASSERT_TRUE(ts->tiles.size() == 3);
-
+	ASSERT_TRUE(ts->tiles->size() == 3);
+		
 	//TODO: implementar demais verificações
+
+	map.unload();
+
+	ASSERT_TRUE(map.tilesets.size() == 0);
+	
 }

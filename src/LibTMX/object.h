@@ -42,7 +42,7 @@ namespace tmxparser {
 		bool visible;
 
 		//
-		vector<custom_property*>* properties;
+		shared_ptr<vector<shared_ptr<custom_property>>> properties;
 
 		//ellipse
 		//polygon

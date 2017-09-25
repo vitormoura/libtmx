@@ -20,7 +20,7 @@ namespace tmxparser {
 
 	using namespace std;
 	using namespace rapidxml;
-
+	
 	enum orientations {
 		undefined,
 		orthogonal,
@@ -79,71 +79,28 @@ namespace tmxparser {
 
 	public:
 
-		vector<tileset*> tilesets;
+		vector<std::shared_ptr<tileset>> tilesets;
 
 	public:
 
-		std::map<string, tile_layer*>	tile_layers;
-		std::map<string, object_group*> object_groups;
-		std::map<string, image_layer*>	image_layers;
+		std::map<string, std::shared_ptr<tile_layer>>	tile_layers;
+		std::map<string, std::shared_ptr<object_group>> object_groups;
+		std::map<string, std::shared_ptr<image_layer>>	image_layers;
 		
 	public:
 		map() {}
 		~map() {
-			
-			//TODO: Implementacao logica de limpeza de recursos
-			
-			for (auto og : object_groups) {
-
-				if (og.second->objects != nullptr) {
-
-					for (auto o : *og.second->objects) {
-						
-						if (o->properties != nullptr) {
-
-							for (auto prop : *o->properties) {
-								delete prop;
-							}
-
-							delete o->properties;
-						}
-					}
-
-					delete og.second->objects;
-				}
-
-				delete og.second;
-			}
-
-			for (auto tl : tile_layers) {
-
-				if (tl.second->properties != nullptr) {
-					for (auto prop : *tl.second->properties) {
-						delete prop;
-					}
-
-					delete tl.second->properties;
-				}
-
-				if (tl.second->data != nullptr) {
-					delete tl.second->data;
-				}
-
-				delete tl.second;
-			}
-
-			/*
-			for (auto img : image_layers) {
-				delete img.second;
-			}
-
-			for (auto ts : vector<tileset*> tilesets) {
-				delete ts;
-			}
-			*/
+			unload();
 		}
 
 	public:
+
+		void unload() {
+			tilesets.clear();
+			tile_layers.clear();
+			object_groups.clear();
+			image_layers.clear();
+		}
 
 		bool load(const char* filepath) {
 			
@@ -185,7 +142,7 @@ namespace tmxparser {
 					}
 					//<objectgroup>
 					else if (is_name_equals(mapChildNode, "objectgroup")) {
-						auto objGrp = new object_group();
+						auto objGrp = make_shared<object_group>();
 
 						this->fill_objectgroup(mapChildNode, objGrp);
 
@@ -193,7 +150,7 @@ namespace tmxparser {
 					}
 					//<imagelayer>
 					else if (is_name_equals(mapChildNode, "imagelayer")) {
-						auto imgLayer = new image_layer();
+						auto imgLayer = make_shared<image_layer>();
 
 						this->fill_imagelayer(mapChildNode, imgLayer);
 
@@ -201,7 +158,7 @@ namespace tmxparser {
 					}
 					//<tileset>
 					else if (is_name_equals(mapChildNode, "tileset")) {
-						auto t = new tileset();
+						auto t = make_shared<tileset>();
 
 						this->fill_tileset(mapChildNode, t);
 
@@ -286,7 +243,7 @@ namespace tmxparser {
 
 		bool fill_layer(xml_node<Ch>* layerNode) {
 
-			auto lay = new tile_layer();
+			auto lay = make_shared<tile_layer>(tile_layer());
 
 			lay->data = nullptr;
 			lay->visible = true;
@@ -346,7 +303,7 @@ namespace tmxparser {
 							if (is_value_equals(encodingAttr, "csv"))
 							{
 								//Pré-alocando uma lista suficiente para guardar todas as referências
-								lay->data = new vector<int>(lay->width * lay->height);
+								lay->data = make_shared<vector<int>>(vector<int>(lay->width * lay->height));
 
 								int pos = 0;
 								char separator;
@@ -384,7 +341,7 @@ namespace tmxparser {
 			return true;
 		}
 
-		bool fill_objectgroup(xml_node<Ch>* node, object_group* grp) {
+		bool fill_objectgroup(xml_node<Ch>* node, shared_ptr<object_group> grp) {
 
 			grp->opacity = 1.0f;
 			grp->visible = true;
@@ -437,9 +394,9 @@ namespace tmxparser {
 				else if (is_name_equals(currentNode, "object")) {
 
 					if (grp->objects == nullptr)
-						grp->objects = new vector<object*>();
+						grp->objects = make_shared<vector<shared_ptr<object>>>();
 
-					auto obj = new object();
+					auto obj = make_shared<object>();
 
 					this->fill_object(currentNode, obj);
 
@@ -454,7 +411,7 @@ namespace tmxparser {
 			return false;
 		}
 
-		bool fill_imagelayer(xml_node<Ch>* node, image_layer* imgLayer) {
+		bool fill_imagelayer(xml_node<Ch>* node, shared_ptr<image_layer> imgLayer) {
 			
 			imgLayer->opacity = 1.0;
 			imgLayer->visible = true;
@@ -493,7 +450,7 @@ namespace tmxparser {
 					imgLayer->properties = this->fill_properties(currentNode);
 				}
 				else if (is_name_equals(currentNode, "image")) {
-					imgLayer->image = new tileset_image();
+					imgLayer->image = make_shared<tileset_image>();
 					this->fill_image(currentNode, imgLayer->image);
 				}
 
@@ -503,7 +460,7 @@ namespace tmxparser {
 			return false;
 		}
 
-		bool fill_tileset(xml_node<Ch>* node, tileset* t) {
+		bool fill_tileset(xml_node<Ch>* node, shared_ptr<tileset> t) {
 						
 			for (xml_attribute<Ch>* attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
 
@@ -558,7 +515,8 @@ namespace tmxparser {
 				}
 				else if (is_name_equals(currentNode, "image"))
 				{
-					this->fill_image(currentNode, &t->image);
+					t->image = make_shared<tileset_image>();
+					this->fill_image(currentNode, t->image);
 				}
 				else if (is_name_equals(currentNode, "terraintypes"))
 				{
@@ -566,11 +524,14 @@ namespace tmxparser {
 				}
 				else if (is_name_equals(currentNode, "tile"))
 				{
-					auto tile = new tileset_tile();
+					auto tile = make_shared<tileset_tile>();
 
 					this->fill_tile(currentNode, tile);
 
-					t->tiles.push_back(tile);
+					if (t->tiles == nullptr)
+						t->tiles = make_shared<vector<shared_ptr<tileset_tile>>>();
+
+					t->tiles->push_back(tile);
 				}
 
 				currentNode = currentNode->next_sibling();
@@ -580,15 +541,16 @@ namespace tmxparser {
 			return false;
 		}
 
-		vector<custom_property*>* fill_properties(xml_node<Ch>* propertiesNode) {
+		shared_ptr<vector<shared_ptr<custom_property>>> fill_properties(xml_node<Ch>* propertiesNode) {
 
-			auto result = new vector<custom_property*>();
+			auto result =  make_shared<vector<shared_ptr<custom_property>>>();
 			auto propChildNode = propertiesNode->first_node();
 
 			while (propChildNode) {
 
-				auto prop = new custom_property();
+				auto prop = make_shared<custom_property>();
 				prop->type = custom_property::types::string_type;
+				
 
 				for (xml_attribute<Ch>* attr = propChildNode->first_attribute(); attr; attr = attr->next_attribute()) {
 
@@ -626,7 +588,7 @@ namespace tmxparser {
 			return result;
 		}
 
-		bool fill_object(xml_node<Ch>* objNode, object* obj) {
+		bool fill_object(xml_node<Ch>* objNode, shared_ptr<object> obj) {
 
 			obj->visible = true;
 			obj->rotation = 0;
@@ -681,7 +643,7 @@ namespace tmxparser {
 			return true;
 		}
 
-		void fill_image(xml_node<Ch>* imageNode, tileset_image* img) {
+		void fill_image(xml_node<Ch>* imageNode, shared_ptr<tileset_image> img) {
 
 			for (xml_attribute<Ch>* attr = imageNode->first_attribute(); attr; attr = attr->next_attribute()) {
 
@@ -700,7 +662,7 @@ namespace tmxparser {
 			}
 		}
 
-		void fill_tile(xml_node<Ch>* tileNode, tileset_tile* tile) {
+		void fill_tile(xml_node<Ch>* tileNode, shared_ptr<tileset_tile> tile) {
 
 			read_to(tileNode->first_attribute("id"), &tile->id);
 						 			
@@ -713,7 +675,7 @@ namespace tmxparser {
 			auto objgrpNode = tileNode->first_node("objectgroup");
 
 			if (objgrpNode != nullptr) {
-				tile->object_group = new object_group();
+				tile->object_group = make_shared<object_group>();
 				this->fill_objectgroup(objgrpNode, tile->object_group);
 			}
 		}

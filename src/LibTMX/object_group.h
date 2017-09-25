@@ -35,7 +35,7 @@ namespace tmxparser {
 		draworder draw_order;
 
 		//
-		vector<object*>* objects;
+		shared_ptr<vector<shared_ptr<object>>> objects;
 	};
 }
 

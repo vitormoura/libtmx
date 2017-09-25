@@ -23,10 +23,10 @@ namespace tmxparser {
 		int y;
 				
 		//
-		vector<custom_property*>* properties;
+		shared_ptr<vector<shared_ptr<custom_property>>> properties;
 
 		//
-		tileset_image* image;
+		shared_ptr<tileset_image> image;
 	};
 }
 

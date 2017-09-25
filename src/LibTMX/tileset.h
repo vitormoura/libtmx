@@ -52,13 +52,13 @@ namespace tmxparser {
 		point tile_offset;
 
 		//This element defines an array of terrain types, which can be referenced from the terrain attribute of the tile element
-		vector<tileset_terrain*> terrain_types;
+		shared_ptr<vector<shared_ptr<tileset_terrain>>> terrain_types;
 
 		//
-		vector<tileset_tile*> tiles;
+		shared_ptr<vector<shared_ptr<tileset_tile>>> tiles;
 
 		//
-		tileset_image image;
+		shared_ptr<tileset_image> image;
 		
 	};
 }

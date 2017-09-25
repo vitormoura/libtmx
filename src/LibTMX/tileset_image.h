@@ -28,7 +28,7 @@ namespace tmxparser {
 		size_t height;
 
 		//
-		vector<int>* data;
+		shared_ptr<vector<int>> data;
 	};
 }
 
