@@ -36,6 +36,7 @@ namespace tmxparser {
 		left_up
 	};
 
+	//mapa 
 	template<class Ch = char>
 	class map
 	{
@@ -74,18 +75,17 @@ namespace tmxparser {
 		// The background color of the map. 
 		string background_color;
 
-		//Última mensagem de erro
+	public:
+
+		//Última mensagem de erro levantada durante rotina de carga do arquivo TMX
 		string error;
 
 	public:
 
-		vector<std::shared_ptr<tileset>> tilesets;
-
-	public:
-
-		std::map<string, std::shared_ptr<tile_layer>>	tile_layers;
-		std::map<string, std::shared_ptr<object_group>> object_groups;
-		std::map<string, std::shared_ptr<image_layer>>	image_layers;
+		vector<shared_ptr<tileset>>					tilesets;
+		std::map<string, shared_ptr<tile_layer>>	tile_layers;
+		std::map<string, shared_ptr<object_group>>	object_groups;
+		std::map<string, shared_ptr<image_layer>>	image_layers;
 		
 	public:
 		map() {}
@@ -94,14 +94,8 @@ namespace tmxparser {
 		}
 
 	public:
-
-		void unload() {
-			tilesets.clear();
-			tile_layers.clear();
-			object_groups.clear();
-			image_layers.clear();
-		}
-
+				
+		//load carrega o arquivo .tmx localizado no caminho informado, alimentando as propriedades desse objeto
 		bool load(const char* filepath) {
 			
 			using namespace std;
@@ -110,6 +104,9 @@ namespace tmxparser {
 				error = "nenhum caminho de arquivo fornecido";
 				return false;
 			}
+
+			//Limpa dados carregados anteriormente
+			unload();
 						
 			xml_document<> doc;
 			unique_ptr<file<>> tmxFile(nullptr);
@@ -177,6 +174,22 @@ namespace tmxparser {
 				error = "arquivo xml nao parece ser um arquivo tmx valido";
 				return false;
 			}
+		}
+
+		//unload limpa todas as propriedades carregadas anteriormente
+		void unload() {
+
+			width = height = tile_width = tile_height = 0;
+
+			version.clear();
+			tiled_version.clear();
+			background_color.clear();
+			error.clear();
+
+			tilesets.clear();
+			tile_layers.clear();
+			object_groups.clear();
+			image_layers.clear();
 		}
 
 	private:
@@ -329,7 +342,8 @@ namespace tmxparser {
 
 				}
 				else if (is_name_equals(layerNodeChild, "properties")) {
-					lay->properties = this->fill_properties(layerNodeChild);
+					lay->properties = make_shared<vector<shared_ptr<custom_property>>>();
+					this->fill_properties(layerNodeChild, lay->properties);
 				}
 
 				layerNodeChild = layerNodeChild->next_sibling();
@@ -389,7 +403,8 @@ namespace tmxparser {
 			{
 				if (is_name_equals(currentNode, "properties"))
 				{
-					grp->properties = this->fill_properties(currentNode);
+					grp->properties = make_shared<vector<shared_ptr<custom_property>>>();
+					this->fill_properties(currentNode, grp->properties);
 				}
 				else if (is_name_equals(currentNode, "object")) {
 
@@ -447,7 +462,8 @@ namespace tmxparser {
 
 				if (is_name_equals(currentNode, "properties"))
 				{
-					imgLayer->properties = this->fill_properties(currentNode);
+					imgLayer->properties = make_shared<vector<shared_ptr<custom_property>>>();
+					this->fill_properties(currentNode, imgLayer->properties);
 				}
 				else if (is_name_equals(currentNode, "image")) {
 					imgLayer->image = make_shared<tileset_image>();
@@ -541,9 +557,8 @@ namespace tmxparser {
 			return false;
 		}
 
-		shared_ptr<vector<shared_ptr<custom_property>>> fill_properties(xml_node<Ch>* propertiesNode) {
-
-			auto result =  make_shared<vector<shared_ptr<custom_property>>>();
+		bool fill_properties(xml_node<Ch>* propertiesNode, shared_ptr<vector<shared_ptr<custom_property>>> result) {
+						
 			auto propChildNode = propertiesNode->first_node();
 
 			while (propChildNode) {
@@ -585,7 +600,7 @@ namespace tmxparser {
 				propChildNode = propChildNode->next_sibling();
 			}
 
-			return result;
+			return true;
 		}
 
 		bool fill_object(xml_node<Ch>* objNode, shared_ptr<object> obj) {
@@ -633,7 +648,8 @@ namespace tmxparser {
 			while (currNode) {
 
 				if (is_name_equals(currNode, "properties")) {
-					obj->properties = this->fill_properties(currNode);
+					obj->properties = make_shared<vector<shared_ptr<custom_property>>>();
+					this->fill_properties(currNode, obj->properties);
 				}
 
 				currNode = currNode->next_sibling();
@@ -669,7 +685,8 @@ namespace tmxparser {
 			auto propsNode = tileNode->first_node("properties");
 
 			if (propsNode != nullptr) {
-				tile->properties = this->fill_properties(propsNode);
+				tile->properties = make_shared<vector<shared_ptr<custom_property>>>();
+				this->fill_properties(propsNode, tile->properties);
 			}
 
 			auto objgrpNode = tileNode->first_node("objectgroup");

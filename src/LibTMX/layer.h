@@ -32,6 +32,10 @@ namespace tmxparser {
 
 		//
 		shared_ptr<vector<shared_ptr<custom_property>>> properties;
+
+	public:
+		virtual ~layer() {}
+
 	};
 }
 

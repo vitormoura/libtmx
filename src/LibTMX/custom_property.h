@@ -4,7 +4,7 @@
 #include <string>
 
 namespace tmxparser {
-
+		
 	using namespace std;
 
 	class custom_property {
@@ -20,7 +20,7 @@ namespace tmxparser {
 		};
 
 	public:
-
+		
 		// The name of the property.
 		string name;
 

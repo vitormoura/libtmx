@@ -14,6 +14,7 @@ namespace tmxparser {
 
 	class image_layer : 
 		public layer {
+
 	public:
 
 		// The x position of the image layer in pixels. (deprecated since 0.15)
@@ -27,6 +28,7 @@ namespace tmxparser {
 
 		//
 		shared_ptr<tileset_image> image;
+			
 	};
 }
 
