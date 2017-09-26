@@ -166,6 +166,8 @@ namespace tmxparser {
 					mapChildNode = mapChildNode->next_sibling();
 				} 
 				
+				//Preenchimento de referências entre
+
 
 				//Validação simples
 				return version.size() > 0 && width > 0 && height > 0;
@@ -316,7 +318,7 @@ namespace tmxparser {
 							if (is_value_equals(encodingAttr, "csv"))
 							{
 								//Pré-alocando uma lista suficiente para guardar todas as referências
-								lay->data = make_shared<vector<int>>(lay->width * lay->height);
+								lay->data = make_shared<vector<shared_ptr<tileset_tile>>>(lay->width * lay->height);
 
 								int pos = 0;
 								char separator;
@@ -327,7 +329,18 @@ namespace tmxparser {
 									iss >> id;
 
 									if (!iss.fail()) {
-										lay->data->at(pos++) = id;
+										shared_ptr<tileset> ownerTs = nullptr;
+
+										for (auto ts : this->tilesets) {
+											if (id >= ts->firstgid) {
+												ownerTs = ts;
+											}
+										}
+
+										if (ownerTs != nullptr) {
+											lay->data->at(pos++) = ownerTs->tiles[id];
+										}
+
 										iss >> separator;
 									}
 								}
@@ -520,6 +533,13 @@ namespace tmxparser {
 				//TODO
 			}
 
+			//Criando o conjunto padrão de tiles deste tileset
+			for (size_t i = t->firstgid; i < (t->firstgid + t->tile_count); i++)
+			{
+				t->tiles[i] = make_shared<tileset_tile>();
+				t->tiles[i]->id = i;
+			}
+
 			xml_node<Ch>* currentNode = detailsNode->first_node();
 
 			do
@@ -540,14 +560,12 @@ namespace tmxparser {
 				}
 				else if (is_name_equals(currentNode, "tile"))
 				{
-					auto tile = make_shared<tileset_tile>();
+					//auto tile = make_shared<tileset_tile>();
+					auto tempTile = make_shared<tileset_tile>();
 
-					this->fill_tile(currentNode, tile);
-
-					if (t->tiles == nullptr)
-						t->tiles = make_shared<vector<shared_ptr<tileset_tile>>>();
-
-					t->tiles->push_back(tile);
+					this->fill_tile(currentNode, tempTile);
+										
+					t->tiles[tempTile->id] = tempTile;
 				}
 
 				currentNode = currentNode->next_sibling();

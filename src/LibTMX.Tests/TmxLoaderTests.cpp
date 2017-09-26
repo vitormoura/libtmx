@@ -43,7 +43,7 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(map.tile_height, 32);
 
 	//Tileset
-	ASSERT_TRUE(map.tilesets.size() == 1);
+	ASSERT_EQ(map.tilesets.size(), 1);
 		
 	auto ts = map.tilesets[0];
 
@@ -53,8 +53,8 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts->tile_height, 32);
 	ASSERT_EQ(ts->tile_count, 1792);
 	ASSERT_EQ(ts->columns, 8);
-	ASSERT_EQ(ts->tile_offset.x, 15);
-	ASSERT_EQ(ts->tile_offset.y, 15);
+	ASSERT_EQ(ts->tile_offset.x, 0);
+	ASSERT_EQ(ts->tile_offset.y, 0);
 	
 	//Tileset/image
 	
@@ -66,11 +66,10 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_TRUE(ts->image->data == nullptr);
 
 	//Tileset/tiles
+		
+	ASSERT_EQ(ts->tiles.size(), 1792);
 
-	ASSERT_TRUE(ts->tiles != nullptr);
-	ASSERT_TRUE(ts->tiles->size() == 3);
-
-	auto ts_0 = ts->tiles->at(0);
+	auto ts_0 = ts->tiles[44];
 
 	ASSERT_EQ(ts_0->id, 44);
 	ASSERT_EQ(ts_0->properties->size(), 1);
@@ -94,7 +93,7 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->width, 32);
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->height, 32);
 
-	auto ts_2 = ts->tiles->at(2);
+	auto ts_2 = ts->tiles[176];
 
 	ASSERT_EQ(ts_2->object_group->objects->size(), 1);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->id, 1);
@@ -102,6 +101,12 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->y, -2);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->width, 40);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->height, 37);
+
+	ASSERT_EQ(map.tile_layers["Terrain"]->data->size(), 576);
+
+	auto tl_tile_0 =  map.tile_layers["Terrain"]->data->at(0);
+
+	ASSERT_EQ(tl_tile_0->id, 1116);
 
 	//TODO: implementar demais verificações
 

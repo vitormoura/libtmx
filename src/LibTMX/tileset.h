@@ -55,7 +55,7 @@ namespace tmxparser {
 		shared_ptr<vector<shared_ptr<tileset_terrain>>> terrain_types;
 
 		//
-		shared_ptr<vector<shared_ptr<tileset_tile>>> tiles;
+		std::map<int,shared_ptr<tileset_tile>> tiles;
 
 		//
 		shared_ptr<tileset_image> image;
