@@ -120,9 +120,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Program.cpp" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="image_layer.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="custom_property.h" />
@@ -140,7 +137,6 @@
     <ClInclude Include="tileset_tile.h" />
     <ClInclude Include="tile_layer.h" />
   </ItemGroup>
-  
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

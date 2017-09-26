@@ -36,7 +36,7 @@ namespace tmxparser {
 		left_up
 	};
 
-	//mapa 
+	//map representa um mapa do tiled editor, carregado a partir de arquivos .tmx
 	template<class Ch = char>
 	class map
 	{
@@ -316,7 +316,7 @@ namespace tmxparser {
 							if (is_value_equals(encodingAttr, "csv"))
 							{
 								//Pré-alocando uma lista suficiente para guardar todas as referências
-								lay->data = make_shared<vector<int>>(vector<int>(lay->width * lay->height));
+								lay->data = make_shared<vector<int>>(lay->width * lay->height);
 
 								int pos = 0;
 								char separator;

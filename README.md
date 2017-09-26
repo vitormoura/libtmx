@@ -1,5 +1,7 @@
 # libtmx
-Biblioteca C++ para leitura de arquivos tmx gerados pelo Tiled Map Editor (Versão preliminar)
+Biblioteca C++ para leitura de arquivos tmx gerados pelo Tiled Map Editor (Versão preliminar).  
+
+Internamente, a biblioteca utiliza o [rapidxml](http://rapidxml.sourceforge.net/) para leitura dos arquivos XML. 
 
 ### Utilização
 
