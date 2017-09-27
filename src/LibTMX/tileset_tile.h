@@ -14,6 +14,9 @@ namespace tmxparser {
 		//The local tile ID within its tileset.
 		int id;
 
+		//
+		point position;
+
 		//The type of the tile. Refers to an object type and is used by tile objects
 		string type;
 
@@ -28,6 +31,11 @@ namespace tmxparser {
 
 		//terrain
 		//animation
+
+		tileset_tile() 
+			: probability(1.0f) {
+
+		}
 	};
 }
 

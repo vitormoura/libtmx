@@ -326,9 +326,11 @@ namespace tmxparser {
 
 								while (!iss.eof()) {
 									int id;
-									iss >> id;
+									iss >> id; //Tile Global ID
 
 									if (!iss.fail()) {
+										
+										//Localizando tileset com maior firstgid igual ao ID global
 										shared_ptr<tileset> ownerTs = nullptr;
 
 										for (auto ts : this->tilesets) {
@@ -337,6 +339,7 @@ namespace tmxparser {
 											}
 										}
 
+										//Caso localizado, 
 										if (ownerTs != nullptr) {
 											lay->data->at(pos++) = ownerTs->tiles[id];
 										}
@@ -534,10 +537,15 @@ namespace tmxparser {
 			}
 
 			//Criando o conjunto padrão de tiles deste tileset
-			for (size_t i = t->firstgid; i < (t->firstgid + t->tile_count); i++)
+			for (size_t id = t->firstgid, i = 0; i < t->tile_count; id++, i++)
 			{
-				t->tiles[i] = make_shared<tileset_tile>();
-				t->tiles[i]->id = i;
+				auto line = (i / t->columns);
+
+				t->tiles[id] = make_shared<tileset_tile>();
+				
+				t->tiles[id]->id = id; //global ID
+				t->tiles[id]->position.x = (t->tile_width * i) - (line * t->tile_width * t->columns);
+				t->tiles[id]->position.y = line * t->tile_height;
 			}
 
 			xml_node<Ch>* currentNode = detailsNode->first_node();
@@ -560,11 +568,14 @@ namespace tmxparser {
 				}
 				else if (is_name_equals(currentNode, "tile"))
 				{
-					//auto tile = make_shared<tileset_tile>();
 					auto tempTile = make_shared<tileset_tile>();
 
 					this->fill_tile(currentNode, tempTile);
 										
+					//O identificador do tile alimentado é um identificador local, devemos complementar seu ID com o 
+					//firstgid do tileset
+					tempTile->id = tempTile->id + t->firstgid;
+
 					t->tiles[tempTile->id] = tempTile;
 				}
 
@@ -701,6 +712,8 @@ namespace tmxparser {
 			read_to(tileNode->first_attribute("id"), &tile->id);
 						 			
 			auto propsNode = tileNode->first_node("properties");
+
+			tile->probability = 1.0f;
 
 			if (propsNode != nullptr) {
 				tile->properties = make_shared<vector<shared_ptr<custom_property>>>();
