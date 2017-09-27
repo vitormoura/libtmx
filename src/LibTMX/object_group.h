@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "enums.h"
 #include "layer.h"
 #include "custom_property.h"
 #include "point.h"
@@ -36,6 +37,9 @@ namespace tmxparser {
 
 		//
 		shared_ptr<vector<shared_ptr<object>>> objects;
+
+	public:
+		object_group() : layer::layer(layer_types::object_t) {}
 	};
 }
 

@@ -2,22 +2,13 @@
 #define __custom_property__
 
 #include <string>
+#include "enums.h"
 
 namespace tmxparser {
 		
 	using namespace std;
 
 	class custom_property {
-	
-	public:
-		enum types {
-			string_type, 
-			int_type, 
-			float_type, 
-			bool_type, 
-			color_type,
-			file_type
-		};
 
 	public:
 		
@@ -25,7 +16,7 @@ namespace tmxparser {
 		string name;
 
 		//The type of the property. Can be string (default), int, float, bool, color or file (since 0.16, with color and file added in 0.17).
-		types type;
+		prop_types type;
 
 		//The value of the property.
 		string value;

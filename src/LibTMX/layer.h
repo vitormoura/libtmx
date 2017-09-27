@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "enums.h"
 #include "point.h"
 #include "custom_property.h"
 
@@ -11,6 +12,8 @@ namespace tmxparser {
 	class layer {
 
 	public:
+
+		layer_types type;
 
 		//The name of the layer
 		string name;
@@ -34,6 +37,7 @@ namespace tmxparser {
 		std::map<string,shared_ptr<custom_property>> properties;
 
 	public:
+		layer(layer_types t) : type(t) {}
 		virtual ~layer() {}
 
 	};

@@ -109,6 +109,18 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 
 	ASSERT_EQ(tl_tile_23->id, 918);
 
+
+	//Layers
+	ASSERT_EQ(map.layers.size(), 5);
+	ASSERT_EQ(map.layers[0]->type, tmxparser::layer_types::tiles_t);
+	ASSERT_EQ(map.layers[1]->type, tmxparser::layer_types::image_t);
+	ASSERT_EQ(map.layers[2]->type, tmxparser::layer_types::tiles_t);
+	ASSERT_EQ(map.layers[3]->type, tmxparser::layer_types::object_t);
+	ASSERT_EQ(map.layers[4]->type, tmxparser::layer_types::object_t);
+
+
+	ASSERT_EQ(map.layers[1]->visible, false);
+
 	//TODO: implementar demais verificações
 
 	map.unload();

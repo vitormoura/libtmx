@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="enums.h" />
     <ClInclude Include="image_layer.h" />
     <ClInclude Include="layer.h" />
     <ClInclude Include="custom_property.h" />

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "enums.h"
 #include "point.h"
 #include "custom_property.h"
 #include "layer.h"
@@ -29,6 +30,8 @@ namespace tmxparser {
 		//
 		shared_ptr<tileset_image> image;
 			
+	public:
+		image_layer() : layer::layer(layer_types::image_t) {}
 	};
 }
 

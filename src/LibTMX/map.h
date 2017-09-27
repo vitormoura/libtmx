@@ -6,6 +6,7 @@
 #include <sstream>
 #include <map>
 #include <memory>
+#include "enums.h"
 #include "tileset.h"
 #include "tile_layer.h"
 #include "image_layer.h"
@@ -21,21 +22,6 @@ namespace tmxparser {
 	using namespace std;
 	using namespace rapidxml;
 	
-	enum orientations {
-		undefined,
-		orthogonal,
-		isometric,
-		staggered,
-		hexagonal
-	};
-
-	enum renderorders {
-		right_down,
-		right_up,
-		left_down,
-		left_up
-	};
-
 	//map representa um mapa do tiled editor, carregado a partir de arquivos .tmx
 	template<class Ch = char>
 	class map
@@ -83,6 +69,8 @@ namespace tmxparser {
 	public:
 
 		vector<shared_ptr<tileset>>					tilesets;
+		vector<shared_ptr<layer>>					layers;
+
 		std::map<string, shared_ptr<tile_layer>>	tile_layers;
 		std::map<string, shared_ptr<object_group>>	object_groups;
 		std::map<string, shared_ptr<image_layer>>	image_layers;
@@ -135,7 +123,12 @@ namespace tmxparser {
 				{
 					//<layer>
 					if (is_name_equals(mapChildNode, "layer")) {
-						this->fill_layer(mapChildNode);
+						auto layer = make_shared<tile_layer>();
+						
+						this->fill_layer(mapChildNode, layer);
+
+						this->tile_layers[layer->name] = layer;
+						this->layers.push_back(layer);
 					}
 					//<objectgroup>
 					else if (is_name_equals(mapChildNode, "objectgroup")) {
@@ -144,6 +137,7 @@ namespace tmxparser {
 						this->fill_objectgroup(mapChildNode, objGrp);
 
 						this->object_groups[objGrp->name] = objGrp;
+						this->layers.push_back(objGrp);
 					}
 					//<imagelayer>
 					else if (is_name_equals(mapChildNode, "imagelayer")) {
@@ -152,6 +146,7 @@ namespace tmxparser {
 						this->fill_imagelayer(mapChildNode, imgLayer);
 
 						this->image_layers[imgLayer->name] = imgLayer;
+						this->layers.push_back(imgLayer);
 					}
 					//<tileset>
 					else if (is_name_equals(mapChildNode, "tileset")) {
@@ -192,6 +187,7 @@ namespace tmxparser {
 			tile_layers.clear();
 			object_groups.clear();
 			image_layers.clear();
+			layers.clear();
 		}
 
 	private:
@@ -256,10 +252,8 @@ namespace tmxparser {
 			return true;
 		}
 
-		bool fill_layer(xml_node<Ch>* layerNode) {
-
-			auto lay = make_shared<tile_layer>(tile_layer());
-
+		bool fill_layer(xml_node<Ch>* layerNode, shared_ptr<tile_layer> lay ) {
+						
 			lay->data = nullptr;
 			lay->visible = true;
 			lay->opacity = 1.0f;
@@ -364,9 +358,7 @@ namespace tmxparser {
 				layerNodeChild = layerNodeChild->next_sibling();
 
 			} while (layerNodeChild);
-
-			this->tile_layers[lay->name] = lay;
-
+						
 			return true;
 		}
 
@@ -590,7 +582,7 @@ namespace tmxparser {
 			while (propChildNode) {
 
 				auto prop = make_shared<custom_property>();
-				prop->type = custom_property::types::string_type;
+				prop->type = prop_types::string_t;
 				
 
 				for (xml_attribute<Ch>* attr = propChildNode->first_attribute(); attr; attr = attr->next_attribute()) {
@@ -604,19 +596,19 @@ namespace tmxparser {
 					else if (is_name_equals(attr, "type")) {
 												
 						if (is_value_equals(attr, "int")) {
-							prop->type = custom_property::types::int_type;
+							prop->type = prop_types::int_t;
 						}
 						else if (is_value_equals(attr, "float")) {
-							prop->type = custom_property::types::float_type;
+							prop->type = prop_types::float_t;
 						}
 						else if (is_value_equals(attr, "bool")) {
-							prop->type = custom_property::types::bool_type;
+							prop->type = prop_types::bool_t;
 						}
 						else if (is_value_equals(attr, "color")) {
-							prop->type = custom_property::types::color_type;
+							prop->type = prop_types::color_t;
 						}
 						else if (is_value_equals(attr, "file")) {
-							prop->type = custom_property::types::file_type;
+							prop->type = prop_types::file_t;
 						}
 					}					
 				}
