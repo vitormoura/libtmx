@@ -72,19 +72,16 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	auto ts_0 = ts->tiles[45];
 
 	ASSERT_EQ(ts_0->id, 45);
-	ASSERT_EQ(ts_0->properties->size(), 1);
-	ASSERT_EQ(ts_0->properties->at(0)->name, "Type");
-	ASSERT_EQ(ts_0->properties->at(0)->value, "teste");
-
+	ASSERT_EQ(ts_0->properties.size(), 1);
+	ASSERT_EQ(ts_0->properties["Type"]->value, "teste");
+	
 	ASSERT_TRUE(ts_0->object_group != nullptr);
 	ASSERT_EQ(ts_0->object_group->draw_order, object_group::draworder::index );
 	ASSERT_EQ(ts_0->object_group->name, "");
+		
+	ASSERT_EQ(ts_0->object_group->properties.size(), 2);
+	ASSERT_EQ(ts_0->object_group->properties["Tag"]->value, "Pared");
 	
-	ASSERT_TRUE(ts_0->object_group->properties != nullptr);
-	ASSERT_EQ(ts_0->object_group->properties->size(), 2);
-	ASSERT_EQ(ts_0->object_group->properties->at(0)->name, "Tag");
-	ASSERT_EQ(ts_0->object_group->properties->at(0)->value, "Pared");
-
 	ASSERT_TRUE(ts_0->object_group->objects != nullptr);
 	ASSERT_EQ(ts_0->object_group->objects->size(), 1);
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->id, 5);

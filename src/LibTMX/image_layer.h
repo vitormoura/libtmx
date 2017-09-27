@@ -24,7 +24,7 @@ namespace tmxparser {
 		int y;
 				
 		//
-		shared_ptr<vector<shared_ptr<custom_property>>> properties;
+		std::map<string, shared_ptr<custom_property>> properties;
 
 		//
 		shared_ptr<tileset_image> image;

@@ -20,7 +20,7 @@ namespace tmxparser {
 		//The type of the tile. Refers to an object type and is used by tile objects
 		string type;
 
-		shared_ptr<vector<shared_ptr<custom_property>>> properties;
+		std::map<string, shared_ptr<custom_property>> properties;
 		
 		shared_ptr<object_group> object_group;
 

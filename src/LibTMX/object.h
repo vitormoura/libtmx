@@ -42,7 +42,7 @@ namespace tmxparser {
 		bool visible;
 
 		//
-		shared_ptr<vector<shared_ptr<custom_property>>> properties;
+		std::map<string, shared_ptr<custom_property> > properties;
 
 		//ellipse
 		//polygon

@@ -358,7 +358,6 @@ namespace tmxparser {
 
 				}
 				else if (is_name_equals(layerNodeChild, "properties")) {
-					lay->properties = make_shared<vector<shared_ptr<custom_property>>>();
 					this->fill_properties(layerNodeChild, lay->properties);
 				}
 
@@ -419,7 +418,6 @@ namespace tmxparser {
 			{
 				if (is_name_equals(currentNode, "properties"))
 				{
-					grp->properties = make_shared<vector<shared_ptr<custom_property>>>();
 					this->fill_properties(currentNode, grp->properties);
 				}
 				else if (is_name_equals(currentNode, "object")) {
@@ -478,7 +476,6 @@ namespace tmxparser {
 
 				if (is_name_equals(currentNode, "properties"))
 				{
-					imgLayer->properties = make_shared<vector<shared_ptr<custom_property>>>();
 					this->fill_properties(currentNode, imgLayer->properties);
 				}
 				else if (is_name_equals(currentNode, "image")) {
@@ -586,7 +583,7 @@ namespace tmxparser {
 			return false;
 		}
 
-		bool fill_properties(xml_node<Ch>* propertiesNode, shared_ptr<vector<shared_ptr<custom_property>>> result) {
+		bool fill_properties(xml_node<Ch>* propertiesNode, std::map<string,shared_ptr<custom_property>>& result) {
 						
 			auto propChildNode = propertiesNode->first_node();
 
@@ -624,8 +621,8 @@ namespace tmxparser {
 					}					
 				}
 
-				result->push_back(prop);
-
+				result[prop->name] = prop;
+				
 				propChildNode = propChildNode->next_sibling();
 			}
 
@@ -677,7 +674,7 @@ namespace tmxparser {
 			while (currNode) {
 
 				if (is_name_equals(currNode, "properties")) {
-					obj->properties = make_shared<vector<shared_ptr<custom_property>>>();
+										
 					this->fill_properties(currNode, obj->properties);
 				}
 
@@ -716,7 +713,6 @@ namespace tmxparser {
 			tile->probability = 1.0f;
 
 			if (propsNode != nullptr) {
-				tile->properties = make_shared<vector<shared_ptr<custom_property>>>();
 				this->fill_properties(propsNode, tile->properties);
 			}
 

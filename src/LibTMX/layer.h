@@ -31,7 +31,7 @@ namespace tmxparser {
 		size_t height;
 
 		//
-		shared_ptr<vector<shared_ptr<custom_property>>> properties;
+		std::map<string,shared_ptr<custom_property>> properties;
 
 	public:
 		virtual ~layer() {}
