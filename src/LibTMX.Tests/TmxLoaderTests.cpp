@@ -30,7 +30,7 @@ TEST(TmxLoaderTests, CargaCaminhoArquivoXmlInvalidoRetornaFalse) {
 TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 
 	tmxparser::map<> map;
-
+				
 	EXPECT_TRUE(map.load("./Assets/lab_map_001.tmx")); 
 
 	//Map attributes
