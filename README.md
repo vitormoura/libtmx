@@ -1,9 +1,11 @@
 # libtmx
-Biblioteca C++ para leitura de arquivos tmx gerados pelo Tiled Map Editor (Versão preliminar).  
+Biblioteca C++ para leitura de arquivos tmx gerados pelo Tiled Map Editor. Essa biblioteca ainda está em desenvolvimento, funcionando como laboratório para meus experimentos em c++, ainda não tem a proposta de ser um modelo de boas práticas ou desempenho. Consulte a [documentação do Tiled](http://doc.mapeditor.org/en/latest/reference/support-for-tmx-maps/) para conhecer bibliotecas mais maduras para carga de arquivos TMX.
 
-Internamente, a biblioteca utiliza o [rapidxml](http://rapidxml.sourceforge.net/) para leitura dos arquivos XML. 
+Internamente, a libtmx utiliza o [rapidxml](http://rapidxml.sourceforge.net/) para leitura dos arquivos XML. 
 
 ### Utilização
+
+Por se tratar de uma biblioteca formada apenas por arquivo .h, basta incluir seus arquivos ao código do seu projeto e referenciar o namespace `tmxparser`:
 
 ```cpp
 #include "LibTMX/map.h"
@@ -32,3 +34,7 @@ Para viabilizar a execução dos testes unitários você deve configurar as depe
 Caso não tenha interesse em utilizar os testes, remova ou desative o build desse projeto.
 
 Saiba mais sobre a biblioteca gtest em [https://github.com/google/googletest](https://github.com/google/googletest)
+
+### Amostras
+
+O diretório `samples` demonstra a utilização da biblioteca para carregar um mapa qualquer utilizando SDL. Para executá-lo, modifique os arquivos `.prop` para identificar a localização das bibliotecas do SDL (e do próprio libtmx) em seu computador, e copie as DLLs do SDL para o diretório de execução (geralmente Debug/x64 ou Debug/x86).
