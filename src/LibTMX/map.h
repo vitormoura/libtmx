@@ -565,8 +565,8 @@ namespace tmxparser {
 				t->tiles[id] = make_shared<tileset_tile>();
 
 				t->tiles[id]->id = id; //global ID
-				t->tiles[id]->position.x = (t->tile_width * i) - (line * t->tile_width * t->columns);
-				t->tiles[id]->position.y = line * t->tile_height;
+				t->tiles[id]->position.x = t->spacing + (t->tile_width * i) - (line * t->tile_width * t->columns);
+				t->tiles[id]->position.y = t->spacing + (line * t->tile_height);
 			}
 
 			xml_node<Ch>* currentNode = detailsNode->first_node();

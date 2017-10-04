@@ -59,6 +59,9 @@ namespace tmxparser {
 
 		//
 		shared_ptr<tileset_image> image;
+
+	public:
+		tileset() : tile_offset({0,0}), spacing(0), columns(0), margin(0), tile_width(0), tile_height(0), tile_count(0) {}
 		
 	};
 }

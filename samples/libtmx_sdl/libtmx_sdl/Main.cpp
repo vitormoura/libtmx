@@ -5,7 +5,7 @@
 #include <iostream>
 
 
-SDL_Texture* load_texture(SDL_Renderer* renderer, const std::string local)
+SDL_Texture* load_texture(SDL_Renderer* renderer, const std::string local, Uint32 colorkey)
 {
 	assert(renderer != nullptr);
 	assert(local.size() > 0);
@@ -15,6 +15,10 @@ SDL_Texture* load_texture(SDL_Renderer* renderer, const std::string local)
 
 	if (tempSurface == nullptr)
 		return nullptr;
+
+	if (!SDL_SetColorKey(tempSurface, SDL_TRUE, colorkey)) {
+		cout << SDL_GetError() << endl;
+	}
 
 	auto txt = SDL_CreateTextureFromSurface(renderer, tempSurface);
 
@@ -42,7 +46,11 @@ int main(int argc, char *args[])
 	SDL_Renderer *renderer;
 	SDL_Event event;
 
-	SDL_Init(SDL_INIT_VIDEO);              // Initialize SDL2
+	// Initialize SDL
+	if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+		cout << SDL_GetError() << endl;
+		return EXIT_FAILURE;
+	}
 
 										   // Create an application window with the following settings:
 	window = SDL_CreateWindow(
@@ -63,9 +71,14 @@ int main(int argc, char *args[])
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	
-	
+	///*
+	string hexString = "FF00FF";
+	int hexNumber;
+	sscanf(hexString.c_str(), "%x", &hexNumber);
+	//*/
+
 	auto tileset = m.tilesets.at(0);
-	auto texture = load_texture(renderer, tileset->image->source);
+	auto texture = load_texture(renderer, tileset->image->source, hexNumber );
 
 	// The window is open: could enter program loop here (see SDL_PollEvent())
 		
@@ -82,26 +95,42 @@ int main(int argc, char *args[])
 
 		for (auto& layer : m.layers) {
 			
+			//Camadas de tiles são desenhadas
 			if (layer->type == tmxparser::layer_types::tiles_t && layer->visible) {
 
 				auto tile_layer = dynamic_cast<tmxparser::tile_layer*>(layer.get());
 
+				//ajustando alpha da textura que será desenhada
+				if (tile_layer->opacity != 1.0) {
+					SDL_SetTextureAlphaMod(texture, 255 * tile_layer->opacity);
+				}
+				else {
+					SDL_SetTextureAlphaMod(texture, 255);
+				}
+				
+				//linhas 
 				for (size_t l = 0; l < m.width; l++)
 				{
+					//colunas
 					for (size_t c = 0; c < m.height; c++)
 					{
+						//recuperando tile da linha e coluna
 						auto tile = tile_layer->get_tile(c, l);
 						
+						//nem sempre existe um tile na posição desejada
 						if (tile != nullptr) {
-
+							
+							//A imagem a ser desenhada é linha da posição X/Y do tile e do tamanho padrão dos tiles nesse tileset
 							auto srcRect = SDL_Rect{ (int)tile->position.x, (int)tile->position.y, (int)tileset->tile_width, (int)tileset->tile_height };
+
+							//O rect destino precisa ser calculado levando em consideração a linha, coluna e offsets da camada e do tileset
 							auto dstRect = SDL_Rect{
-								(int)layer->offset.x + (int)(c * tileset->tile_width),
-								(int)layer->offset.y + (int)(l * tileset->tile_height),
+								(int)tileset->tile_offset.x + (int)layer->offset.x + (int)(c * tileset->tile_width),
+								(int)tileset->tile_offset.y + (int)layer->offset.y + (int)(l * tileset->tile_height),
 								(int)tileset->tile_width,
 								(int)tileset->tile_height
 							};
-
+														
 							SDL_RenderCopy(renderer, texture, &srcRect, &dstRect);
 						}
 					}
