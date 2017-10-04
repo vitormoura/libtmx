@@ -91,13 +91,13 @@ int main(int argc, char *args[])
 					for (size_t c = 0; c < m.height; c++)
 					{
 						auto tile = tile_layer->get_tile(c, l);
-
+						
 						if (tile != nullptr) {
 
 							auto srcRect = SDL_Rect{ (int)tile->position.x, (int)tile->position.y, (int)tileset->tile_width, (int)tileset->tile_height };
 							auto dstRect = SDL_Rect{
-								(int)(c * tileset->tile_width),
-								(int)(l * tileset->tile_height),
+								(int)layer->offset.x + (int)(c * tileset->tile_width),
+								(int)layer->offset.y + (int)(l * tileset->tile_height),
 								(int)tileset->tile_width,
 								(int)tileset->tile_height
 							};

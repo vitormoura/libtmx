@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="24" height="24" tilewidth="32" tileheight="32" nextobjectid="80">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="24" height="24" tilewidth="32" tileheight="32" nextobjectid="81">
  <tileset firstgid="1" name="routes_003" tilewidth="32" tileheight="32" tilecount="1792" columns="8">
   <image source="lab_tilemap_001.png" trans="ff00ff" width="256" height="7199"/>
   <tile id="44">
@@ -91,7 +91,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup name="Regions" visible="0">
+ <objectgroup name="Regions">
   <object id="32" name="Grass" type="GroundEffect" x="416" y="64" width="288" height="288"/>
   <object id="33" name="Ice" type="GroundEffect" x="97" y="64" width="255" height="288">
    <properties>

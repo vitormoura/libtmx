@@ -37,7 +37,7 @@ namespace tmxparser {
 		std::map<string,shared_ptr<custom_property>> properties;
 
 	public:
-		layer(layer_types t) : type(t) {}
+		layer(layer_types t) : type(t), offset({0,0}), visible(false), opacity(1.0f) {}
 		virtual ~layer() {}
 
 	};
