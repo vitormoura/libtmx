@@ -21,7 +21,7 @@ namespace tmxparser {
 
 	using namespace std;
 	using namespace rapidxml;
-	
+
 	//map representa um mapa do tiled editor, carregado a partir de arquivos .tmx
 	template<class Ch = char>
 	class map
@@ -61,6 +61,9 @@ namespace tmxparser {
 		// The background color of the map. 
 		string background_color;
 
+		//file_path contains the file directory and file name
+		std::pair<string, string> file_path;
+
 	public:
 
 		//Última mensagem de erro levantada durante rotina de carga do arquivo TMX
@@ -74,7 +77,7 @@ namespace tmxparser {
 		std::map<string, shared_ptr<tile_layer>>	tile_layers;
 		std::map<string, shared_ptr<object_group>>	object_groups;
 		std::map<string, shared_ptr<image_layer>>	image_layers;
-		
+
 	public:
 		map() {}
 		~map() {
@@ -82,10 +85,10 @@ namespace tmxparser {
 		}
 
 	public:
-				
+
 		//load carrega o arquivo .tmx localizado no caminho informado, alimentando as propriedades desse objeto
 		bool load(const char* filepath) {
-			
+
 			using namespace std;
 
 			if (filepath == nullptr || strlen(filepath) == 0) {
@@ -95,12 +98,15 @@ namespace tmxparser {
 
 			//Limpa dados carregados anteriormente
 			unload();
-						
+
+			//Identificando diretório e arquivo carregado
+			fill_filepath(filepath);
+
 			xml_document<> doc;
 			unique_ptr<file<>> tmxFile(nullptr);
-						
+
 			try {
-				
+
 				tmxFile.reset(new file<>(filepath));
 				doc.parse<0>(tmxFile->data());
 				//doc.parse<parse_declaration_node | parse_no_data_nodes>(tmxFile->data());
@@ -111,20 +117,20 @@ namespace tmxparser {
 			}
 
 			auto mapNode = doc.first_node("map");
-			
+
 			if (mapNode != nullptr) {
 
 				//Preenchimento de atributos da tab <map>
 				this->fill_map_attributes(mapNode);
 
 				auto mapChildNode = mapNode->first_node();
-				
-				while (mapChildNode != nullptr) 
+
+				while (mapChildNode != nullptr)
 				{
 					//<layer>
 					if (is_name_equals(mapChildNode, "layer")) {
 						auto layer = make_shared<tile_layer>();
-						
+
 						this->fill_layer(mapChildNode, layer);
 
 						this->tile_layers[layer->name] = layer;
@@ -156,12 +162,12 @@ namespace tmxparser {
 
 						this->tilesets.push_back(t);
 					}
-				
+
 
 					mapChildNode = mapChildNode->next_sibling();
-				} 
-				
-				//Preenchimento de referências entre
+				}
+
+
 
 
 				//Validação simples
@@ -182,6 +188,8 @@ namespace tmxparser {
 			tiled_version.clear();
 			background_color.clear();
 			error.clear();
+			file_path.first.clear();
+			file_path.second.clear();
 
 			tilesets.clear();
 			tile_layers.clear();
@@ -192,8 +200,28 @@ namespace tmxparser {
 
 	private:
 
+		bool fill_filepath(const char* filepath) {
+
+			this->file_path.first.clear();
+			this->file_path.second.assign(filepath);
+
+			size_t found = this->file_path.second.find_last_of("/\\");
+
+			if (found != string::npos) {
+				this->file_path.first = this->file_path.second.substr(0, found);
+				this->file_path.second.erase(0, found + 1);
+
+				//Se o diretório for equivalente ao '.' vamos removê-lo
+				if (this->file_path.first.size() == 1 && this->file_path.first[0] == '.') {
+					this->file_path.first.clear();
+				}
+			}
+
+			return this->file_path.second.size() > 0;
+		}
+
 		bool fill_map_attributes(xml_node<Ch>* mapNode) {
-						
+
 			for (xml_attribute<>* attr = mapNode->first_attribute(); attr; attr = attr->next_attribute()) {
 
 				if (is_name_equals(attr, "version")) {
@@ -252,8 +280,8 @@ namespace tmxparser {
 			return true;
 		}
 
-		bool fill_layer(xml_node<Ch>* layerNode, shared_ptr<tile_layer> lay ) {
-						
+		bool fill_layer(xml_node<Ch>* layerNode, shared_ptr<tile_layer> lay) {
+
 			lay->data = nullptr;
 			lay->visible = true;
 			lay->opacity = 1.0f;
@@ -323,7 +351,7 @@ namespace tmxparser {
 									iss >> id; //Tile Global ID
 
 									if (!iss.fail()) {
-										
+																				
 										//Localizando tileset com maior firstgid igual ao ID global
 										shared_ptr<tileset> ownerTs = nullptr;
 
@@ -337,8 +365,12 @@ namespace tmxparser {
 										if (ownerTs != nullptr) {
 											lay->data->at(pos++) = ownerTs->tiles[id];
 										}
+										else {
+											lay->data->at(pos++) = nullptr;
+										}
 
 										iss >> separator;
+
 									}
 								}
 							}
@@ -358,7 +390,7 @@ namespace tmxparser {
 				layerNodeChild = layerNodeChild->next_sibling();
 
 			} while (layerNodeChild);
-						
+
 			return true;
 		}
 
@@ -372,7 +404,7 @@ namespace tmxparser {
 				if (is_name_equals(attr, "name")) {
 					read_to(attr, grp->name);
 				}
-				else if (is_name_equals(attr, "x") ) {
+				else if (is_name_equals(attr, "x")) {
 					read_to(attr, &grp->x);
 				}
 				else if (is_name_equals(attr, "y")) {
@@ -396,10 +428,10 @@ namespace tmxparser {
 				else if (is_name_equals(attr, "offsety")) {
 					read_to(attr, &grp->offset.y);
 				}
-				else if (is_name_equals(attr, "draworder") ) {
+				else if (is_name_equals(attr, "draworder")) {
 					grp->draw_order = is_value_equals(attr, "index") ? object_group::draworder::index : object_group::draworder::topdown;
 				}
-				else if (is_name_equals(attr, "color") ) {
+				else if (is_name_equals(attr, "color")) {
 					read_to(attr, grp->color, true);
 				}
 			}
@@ -433,10 +465,10 @@ namespace tmxparser {
 		}
 
 		bool fill_imagelayer(xml_node<Ch>* node, shared_ptr<image_layer> imgLayer) {
-			
+
 			imgLayer->opacity = 1.0;
 			imgLayer->visible = true;
-			
+
 			for (xml_attribute<Ch>* attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
 
 				if (is_name_equals(attr, "name")) {
@@ -459,12 +491,12 @@ namespace tmxparser {
 				}
 				else if (is_name_equals(attr, "offsety")) {
 					read_to(attr, &imgLayer->offset.y);
-				}				
+				}
 			}
 
 			xml_node<Ch>* currentNode = node->first_node();
 
-			while(currentNode) {
+			while (currentNode) {
 
 				if (is_name_equals(currentNode, "properties"))
 				{
@@ -482,13 +514,13 @@ namespace tmxparser {
 		}
 
 		bool fill_tileset(xml_node<Ch>* node, shared_ptr<tileset> t) {
-						
+
 			for (xml_attribute<Ch>* attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
 
-				if (is_name_equals( attr, "firstgid")) {
+				if (is_name_equals(attr, "firstgid")) {
 					read_to(attr, &t->firstgid);
 				}
-				else if (is_name_equals(attr,  "source")) {
+				else if (is_name_equals(attr, "source")) {
 					read_to(attr, t->source);
 				}
 				else if (is_name_equals(attr, "name")) {
@@ -497,7 +529,7 @@ namespace tmxparser {
 				else if (is_name_equals(attr, "tilewidth")) {
 					read_to(attr, &t->tile_width);
 				}
-				else if (is_name_equals(attr, "tileheight") ) {
+				else if (is_name_equals(attr, "tileheight")) {
 					read_to(attr, &t->tile_height);
 				}
 				else if (is_name_equals(attr, "spacing")) {
@@ -531,7 +563,7 @@ namespace tmxparser {
 				auto line = (i / t->columns);
 
 				t->tiles[id] = make_shared<tileset_tile>();
-				
+
 				t->tiles[id]->id = id; //global ID
 				t->tiles[id]->position.x = (t->tile_width * i) - (line * t->tile_width * t->columns);
 				t->tiles[id]->position.y = line * t->tile_height;
@@ -560,10 +592,11 @@ namespace tmxparser {
 					auto tempTile = make_shared<tileset_tile>();
 
 					this->fill_tile(currentNode, tempTile);
-										
+
 					//O identificador do tile alimentado é um identificador local, devemos complementar seu ID com o 
 					//firstgid do tileset
 					tempTile->id = tempTile->id + t->firstgid;
+					tempTile->position = t->tiles[tempTile->id]->position;
 
 					t->tiles[tempTile->id] = tempTile;
 				}
@@ -571,19 +604,19 @@ namespace tmxparser {
 				currentNode = currentNode->next_sibling();
 
 			} while (currentNode);
-			
+
 			return false;
 		}
 
-		bool fill_properties(xml_node<Ch>* propertiesNode, std::map<string,shared_ptr<custom_property>>& result) {
-						
+		bool fill_properties(xml_node<Ch>* propertiesNode, std::map<string, shared_ptr<custom_property>>& result) {
+
 			auto propChildNode = propertiesNode->first_node();
 
 			while (propChildNode) {
 
 				auto prop = make_shared<custom_property>();
 				prop->type = prop_types::string_t;
-				
+
 
 				for (xml_attribute<Ch>* attr = propChildNode->first_attribute(); attr; attr = attr->next_attribute()) {
 
@@ -594,7 +627,7 @@ namespace tmxparser {
 						read_to(attr, prop->value);
 					}
 					else if (is_name_equals(attr, "type")) {
-												
+
 						if (is_value_equals(attr, "int")) {
 							prop->type = prop_types::int_t;
 						}
@@ -610,11 +643,11 @@ namespace tmxparser {
 						else if (is_value_equals(attr, "file")) {
 							prop->type = prop_types::file_t;
 						}
-					}					
+					}
 				}
 
 				result[prop->name] = prop;
-				
+
 				propChildNode = propChildNode->next_sibling();
 			}
 
@@ -666,7 +699,7 @@ namespace tmxparser {
 			while (currNode) {
 
 				if (is_name_equals(currNode, "properties")) {
-										
+
 					this->fill_properties(currNode, obj->properties);
 				}
 
@@ -683,6 +716,11 @@ namespace tmxparser {
 
 				if (is_name_equals(attr, "source")) {
 					read_to(attr, img->source);
+
+					if (img->source.size() > 0) {
+						img->source.insert(0, "/");
+						img->source.insert(0, this->file_path.first.c_str());
+					}
 				}
 				else if (is_name_equals(attr, "trans")) {
 					read_to(attr, img->transparency_color, true);
@@ -699,7 +737,7 @@ namespace tmxparser {
 		void fill_tile(xml_node<Ch>* tileNode, shared_ptr<tileset_tile> tile) {
 
 			read_to(tileNode->first_attribute("id"), &tile->id);
-						 			
+
 			auto propsNode = tileNode->first_node("properties");
 
 			tile->probability = 1.0f;
@@ -745,7 +783,7 @@ namespace tmxparser {
 		{
 			(*v) = atof(attr->value());
 		}
-				
+
 
 		inline bool is_name_equals(xml_base<Ch>* attr, const char* name)
 		{

@@ -24,12 +24,20 @@ namespace tmxparser {
 	public:
 
 		//get_tile recupera tile na linha e coluna informadas
-		shared_ptr<tileset_tile> get_tile(size_t col, size_t line) {
+		inline shared_ptr<tileset_tile> get_tile(size_t col, size_t line) {
+			assert(line * width + col < data->size());
+
 			return data->at(line * width + col);
+		}
+
+		//get_tile recupera tile com índice sequecial informado
+		inline shared_ptr<tileset_tile> get_tile(size_t index) {
+			assert(index < data->size());
+			return data->at(index);
 		}
 
 	};
 }
 
 
-#endif // !__tile_layer__
+#endif

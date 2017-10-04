@@ -3,7 +3,7 @@
 
 using namespace tmxparser;
 
-TEST(TmxLoaderTests, CargaArquivoNaoExistenteRetornaFalse) {
+TEST(Tests_CargaArquivo, CargaArquivoNaoExistenteRetornaFalse) {
 
 	tmxparser::map<> map;
 	
@@ -11,7 +11,7 @@ TEST(TmxLoaderTests, CargaArquivoNaoExistenteRetornaFalse) {
 	EXPECT_TRUE(map.error.size() > 0);
 }
 
-TEST(TmxLoaderTests, CargaCaminhoArquivoVazioRetornaFalse) {
+TEST(Tests_CargaArquivo, CargaCaminhoArquivoVazioRetornaFalse) {
 
 	tmxparser::map<> map;
 
@@ -19,7 +19,7 @@ TEST(TmxLoaderTests, CargaCaminhoArquivoVazioRetornaFalse) {
 	ASSERT_STRCASEEQ(map.error.c_str(), "nenhum caminho de arquivo fornecido");
 }
 
-TEST(TmxLoaderTests, CargaCaminhoArquivoXmlInvalidoRetornaFalse) {
+TEST(Tests_CargaArquivo, CargaCaminhoArquivoXmlInvalidoRetornaFalse) {
 
 	tmxparser::map<> map;
 
@@ -27,7 +27,7 @@ TEST(TmxLoaderTests, CargaCaminhoArquivoXmlInvalidoRetornaFalse) {
 	ASSERT_STRCASEEQ(map.error.c_str(), "arquivo xml nao parece ser um arquivo tmx valido");
 }
 
-TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
+TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 
 	tmxparser::map<> map;
 				
@@ -41,6 +41,8 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(map.height, 24);
 	ASSERT_EQ(map.tile_width, 32);
 	ASSERT_EQ(map.tile_height, 32);
+	ASSERT_STREQ(map.file_path.first.c_str(), "./Assets");
+	ASSERT_STREQ(map.file_path.second.c_str(), "lab_map_001.tmx");
 
 	//Tileset
 	ASSERT_EQ(map.tilesets.size(), 1);
@@ -62,7 +64,7 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts->image->width, 256);
 	ASSERT_EQ(ts->image->height, 7199);
 	ASSERT_STREQ(ts->image->transparency_color.c_str(), "FF00FF");
-	ASSERT_EQ(ts->image->source, "lab_tilemap_001.png");
+	ASSERT_EQ(ts->image->source, "./Assets/lab_tilemap_001.png");
 	ASSERT_TRUE(ts->image->data == nullptr);
 
 	//Tileset/tiles
@@ -74,7 +76,7 @@ TEST(TmxLoaderTests, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts_0->id, 45);
 	ASSERT_EQ(ts_0->properties.size(), 1);
 	ASSERT_EQ(ts_0->properties["Type"]->value, "teste");
-	
+			
 	ASSERT_TRUE(ts_0->object_group != nullptr);
 	ASSERT_EQ(ts_0->object_group->draw_order, object_group::draworder::index );
 	ASSERT_EQ(ts_0->object_group->name, "");
