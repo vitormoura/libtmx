@@ -59,7 +59,7 @@ namespace tmxparser {
 		//nextobjectid
 
 		// The background color of the map. 
-		string background_color;
+		color background_color;
 
 		//file_path contains the file directory and file name
 		std::pair<string, string> file_path;
@@ -186,7 +186,7 @@ namespace tmxparser {
 
 			version.clear();
 			tiled_version.clear();
-			background_color.clear();
+			background_color;
 			error.clear();
 			file_path.first.clear();
 			file_path.second.clear();
@@ -273,7 +273,7 @@ namespace tmxparser {
 					read_to(attr, &tile_height);
 				}
 				else if (is_name_equals(attr, "backgroundcolor")) {
-					read_to(attr, background_color, true);
+					read_to(attr, background_color);
 				}
 			}
 
@@ -432,7 +432,7 @@ namespace tmxparser {
 					grp->draw_order = is_value_equals(attr, "index") ? object_group::draworder::index : object_group::draworder::topdown;
 				}
 				else if (is_name_equals(attr, "color")) {
-					read_to(attr, grp->color, true);
+					read_to(attr, grp->color);
 				}
 			}
 
@@ -545,7 +545,7 @@ namespace tmxparser {
 					read_to(attr, &t->columns);
 				}
 				else if (is_name_equals(attr, "backgroundcolor")) {
-					read_to(attr, t->background_color, true);
+					read_to(attr, t->background_color);
 				}
 			}
 
@@ -658,6 +658,7 @@ namespace tmxparser {
 
 			obj->visible = true;
 			obj->rotation = 0;
+			obj->shape = object_shapes::rect_t;
 
 			for (xml_attribute<Ch>* attr = objNode->first_attribute(); attr; attr = attr->next_attribute()) {
 
@@ -671,10 +672,10 @@ namespace tmxparser {
 					read_to(attr, obj->type);
 				}
 				else if (is_name_equals(attr, "x")) {
-					read_to(attr, &obj->x);
+					read_to(attr, &obj->position.x);
 				}
 				else if (is_name_equals(attr, "y")) {
-					read_to(attr, &obj->y);
+					read_to(attr, &obj->position.y);
 				}
 				else if (is_name_equals(attr, "width")) {
 					read_to(attr, &obj->width);
@@ -699,9 +700,20 @@ namespace tmxparser {
 			while (currNode) {
 
 				if (is_name_equals(currNode, "properties")) {
-
 					this->fill_properties(currNode, obj->properties);
 				}
+				else if (is_name_equals(currNode, "ellipse")) {
+					obj->shape = object_shapes::ellipse_t;
+				}
+				else if (is_name_equals(currNode, "polygon")) {
+					obj->shape = object_shapes::polygon_t;
+					fill_points(currNode, obj);
+				}
+				else if (is_name_equals(currNode, "polyline")) {
+					obj->shape = object_shapes::polyline_t;
+					fill_points(currNode, obj);
+				}
+				
 
 				currNode = currNode->next_sibling();
 			}
@@ -723,7 +735,7 @@ namespace tmxparser {
 					}
 				}
 				else if (is_name_equals(attr, "trans")) {
-					read_to(attr, img->transparency_color, true);
+					read_to(attr, img->transparency_color);
 				}
 				else if (is_name_equals(attr, "width")) {
 					read_to(attr, &img->width);
@@ -751,6 +763,33 @@ namespace tmxparser {
 			if (objgrpNode != nullptr) {
 				tile->object_group = make_shared<object_group>();
 				this->fill_objectgroup(objgrpNode, tile->object_group);
+			}
+		}
+
+		void fill_points(xml_node<Ch>* polyNode, shared_ptr<object> obj) {
+
+			string points;
+
+			read_to(polyNode->first_attribute("points"), points);
+
+			obj->points = make_shared<vector<point>>();
+
+			istringstream iss(points);
+			string vpair;
+
+			while (std::getline(iss, vpair, ' ')) {
+				point p{};
+
+				p.x = obj->position.x + stof(vpair.substr(0, vpair.find_first_of(',')));
+				p.y = obj->position.y + stof(vpair.substr(vpair.find_first_of(',') + 1));
+
+				obj->points->push_back(p);
+			}
+
+			//A lista de pontos exige a finalização do poligono com um último ponto, exatamente
+			//o ponto de origem
+			if (obj->points->size() > 1) {
+				obj->points->push_back(obj->points->at(0));
 			}
 		}
 
@@ -784,6 +823,18 @@ namespace tmxparser {
 			(*v) = atof(attr->value());
 		}
 
+		inline void read_to(xml_attribute<Ch>* attr, color& c) {
+			
+			c.hex_string.assign(attr->value());
+			
+			int hexNumber;
+
+			sscanf_s(c.hex_string.c_str(), "%x", &hexNumber);
+
+			c.red = (int)(hexNumber % 0x1000000 / 0x10000);
+			c.green = (int)(hexNumber % 0x10000 / 0x100);
+			c.blue = (int)(hexNumber % 0x100);
+		}
 
 		inline bool is_name_equals(xml_base<Ch>* attr, const char* name)
 		{

@@ -58,12 +58,19 @@ TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(ts->tile_offset.x, 0);
 	ASSERT_EQ(ts->tile_offset.y, 0);
 	
+	
 	//Tileset/image
 	
 	ASSERT_EQ(ts->image->format, "");
 	ASSERT_EQ(ts->image->width, 256);
 	ASSERT_EQ(ts->image->height, 7199);
-	ASSERT_STREQ(ts->image->transparency_color.c_str(), "FF00FF");
+	
+	ASSERT_FALSE(ts->image->transparency_color.is_empty());
+	ASSERT_STREQ(ts->image->transparency_color.hex_string.c_str(), "FF00FF");
+	ASSERT_EQ(ts->image->transparency_color.red,255);
+	ASSERT_EQ(ts->image->transparency_color.green, 0);
+	ASSERT_EQ(ts->image->transparency_color.blue, 255);
+
 	ASSERT_EQ(ts->image->source, "./Assets/lab_tilemap_001.png");
 	ASSERT_TRUE(ts->image->data == nullptr);
 
@@ -86,9 +93,10 @@ TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 	
 	ASSERT_TRUE(ts_0->object_group->objects != nullptr);
 	ASSERT_EQ(ts_0->object_group->objects->size(), 1);
+	
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->id, 5);
-	ASSERT_EQ(ts_0->object_group->objects->at(0)->x, 0);
-	ASSERT_EQ(ts_0->object_group->objects->at(0)->y, 0);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->position.x, 0);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->position.y, 0);
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->width, 32);
 	ASSERT_EQ(ts_0->object_group->objects->at(0)->height, 32);
 
@@ -96,8 +104,8 @@ TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 
 	ASSERT_EQ(ts_2->object_group->objects->size(), 1);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->id, 1);
-	ASSERT_EQ(ts_2->object_group->objects->at(0)->x, -3);
-	ASSERT_EQ(ts_2->object_group->objects->at(0)->y, -2);
+	ASSERT_EQ(ts_2->object_group->objects->at(0)->position.x, -3);
+	ASSERT_EQ(ts_2->object_group->objects->at(0)->position.y, -2);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->width, 40);
 	ASSERT_EQ(ts_2->object_group->objects->at(0)->height, 37);
 
@@ -120,6 +128,24 @@ TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 	ASSERT_EQ(map.layers[3]->type, tmxparser::layer_types::object_t);
 	ASSERT_EQ(map.layers[4]->type, tmxparser::layer_types::object_t);
 
+	//Object layers
+	ASSERT_EQ(map.object_groups.size(), 2);
+	
+	auto group_Regions = map.object_groups["Regions"];
+	auto obj_com_polygon = group_Regions->objects->at(3);
+
+	ASSERT_TRUE(obj_com_polygon->shape == object_shapes::polygon_t);
+	ASSERT_TRUE(obj_com_polygon->points != nullptr);
+	ASSERT_EQ(obj_com_polygon->points->size(), 7);
+	
+	/*
+	ASSERT_EQ(obj_com_polygon->polygon->at(0).x, 0);
+	ASSERT_EQ(obj_com_polygon->polygon->at(0).y, 10);
+	ASSERT_EQ(obj_com_polygon->polygon->at(1).x, 94.6667f);
+	ASSERT_EQ(obj_com_polygon->polygon->at(1).y, 11);
+	ASSERT_EQ(obj_com_polygon->polygon->at(2).x, 95.6667f);
+	ASSERT_EQ(obj_com_polygon->polygon->at(2).y, -85.3333f);
+	*/
 
 	ASSERT_EQ(map.layers[1]->visible, false);
 

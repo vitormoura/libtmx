@@ -8,6 +8,7 @@
 #include "tileset_terrain.h"
 #include "tileset_image.h"
 #include "tileset_tile.h"
+#include "color.h"
 
 using namespace std;
 using namespace rapidxml;
@@ -46,7 +47,7 @@ namespace tmxparser {
 		size_t columns;
 
 		//
-		string background_color;
+		color background_color;
 
 		//This element is used to specify an offset in pixels, to be applied when drawing a tile from the related tileset
 		point tile_offset;
@@ -61,7 +62,7 @@ namespace tmxparser {
 		shared_ptr<tileset_image> image;
 
 	public:
-		tileset() : tile_offset({0,0}), spacing(0), columns(0), margin(0), tile_width(0), tile_height(0), tile_count(0) {}
+		tileset() : tile_offset({0,0}), spacing(0), columns(0), margin(0), tile_width(0), tile_height(0), tile_count(0), background_color() {}
 		
 	};
 }

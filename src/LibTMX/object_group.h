@@ -8,6 +8,7 @@
 #include "custom_property.h"
 #include "point.h"
 #include "object.h"
+#include "color.h"
 
 namespace tmxparser {
 
@@ -24,7 +25,7 @@ namespace tmxparser {
 	public:
 				
 		//The color used to display the objects in this group.
-		string color;
+		color color;
 				
 		//The x coordinate of the object group in tiles. Defaults to 0 and can no longer be changed in Tiled Qt
 		int x;

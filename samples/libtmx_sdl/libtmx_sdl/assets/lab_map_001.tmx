@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" renderorder="left-down" width="24" height="24" tilewidth="32" tileheight="32" nextobjectid="81">
+<map version="1.0" orientation="orthogonal" renderorder="left-down" width="24" height="24" tilewidth="32" tileheight="32" nextobjectid="85">
  <tileset firstgid="1" name="routes_003" tilewidth="32" tileheight="32" tilecount="1792" columns="8">
-  <image source="lab_tilemap_001.png" trans="ff00ff" width="256" height="7199"/>
+  <image source="lab_tilemap_001.png" trans="00c6c6" width="256" height="7199"/>
   <tile id="44">
    <properties>
     <property name="Type" value="teste"/>
@@ -111,8 +111,17 @@
   </object>
   <object id="64" name="Goal" type="Goal" x="692" y="688" width="64" height="64"/>
   <object id="66" name="Start" type="Start" x="15.333" y="15.5" width="64" height="64"/>
+  <object id="81" name="centro" x="355" y="389" width="66" height="66">
+   <ellipse/>
+  </object>
+  <object id="83" x="435" y="412" width="54" height="22">
+   <ellipse/>
+  </object>
+  <object id="84" x="631" y="135">
+   <polyline points="0,0 28,44 6,77 30,126 -7,159 -15,126 0,99 -11,56 1,35 -14,6 -2,-2"/>
+  </object>
  </objectgroup>
- <objectgroup name="Enemies" visible="0">
+ <objectgroup name="Enemies">
   <object id="59" name="w1" type="Wanderer" x="416" y="98" width="32" height="32"/>
   <object id="60" name="w5" type="Wanderer" x="192" y="543" width="32" height="32"/>
   <object id="61" name="w2" type="Wanderer" x="417" y="176" width="32" height="32"/>

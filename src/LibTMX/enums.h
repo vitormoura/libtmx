@@ -31,4 +31,11 @@ namespace tmxparser {
 		color_t,
 		file_t
 	};
+
+	enum object_shapes {
+		rect_t,
+		ellipse_t,
+		polygon_t,
+		polyline_t
+	};
 }

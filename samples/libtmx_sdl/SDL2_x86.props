@@ -7,11 +7,11 @@
   <PropertyGroup />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SDL_HOME)\SDL2\include;$(SDL_HOME)\SDL2_Image\include;$(SDL_HOME)\SDL2_mixer\include;$(SDL_HOME)\SDL2_TTF\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SDL_HOME)\SDL2\include;$(SDL_HOME)\SDL2_Image\include;$(SDL_HOME)\SDL2_gfx\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>$(SDL_HOME)\SDL2\lib\x86;$(SDL_HOME)\SDL2_Image\lib\x86;$(SDL_HOME)\SDL2_mixer\lib\x86;$(SDL_HOME)\SDL2_TTF\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_mixer.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SDL_HOME)\SDL2\lib\x86;$(SDL_HOME)\SDL2_Image\lib\x86;$(SDL_HOME)\SDL2_gfx\lib\x86;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_gfx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

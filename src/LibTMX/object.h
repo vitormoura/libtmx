@@ -5,6 +5,7 @@
 #include <vector>
 #include "point.h"
 #include "custom_property.h"
+#include "enums.h"
 
 namespace tmxparser {
 	
@@ -20,12 +21,11 @@ namespace tmxparser {
 		//The type of the object. An arbitrary string
 		string type;
 
-		//The x coordinate of the object in pixels
-		int x;
+		object_shapes shape;
 
-		//The y coordinate of the object in pixels
-		int y;
-
+		//The x,y coordinate of the object in pixels
+		point position;
+		
 		// The width of the object in pixels (defaults to 0)
 		size_t width;
 
@@ -45,9 +45,12 @@ namespace tmxparser {
 		std::map<string, shared_ptr<custom_property> > properties;
 
 		//ellipse
-		//polygon
+		shared_ptr<vector<point>> points;
 		//polyline
 		//text
+
+	public:
+		object() : position(point{0,0}), width(0), height(0), shape(object_shapes::rect_t) {}
 	};
 }
 

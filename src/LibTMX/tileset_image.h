@@ -3,6 +3,7 @@
 
 #include <string>
 #include <vector>
+#include "color.h"
 
 using namespace std;
 
@@ -19,7 +20,7 @@ namespace tmxparser {
 		string source;
 
 		//Defines a specific color that is treated as transparent (example value: "#FF00FF" for magenta)
-		string transparency_color;
+		color transparency_color;
 
 		//The image width in pixels (optional, used for tile index correction when the image changes)
 		size_t width;

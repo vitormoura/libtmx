@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" renderorder="left-down" width="24" height="24" tilewidth="32" tileheight="32" nextobjectid="80">
  <tileset firstgid="1" name="routes_003" tilewidth="32" tileheight="32" tilecount="1792" columns="8">
-  <image source="lab_tilemap_001.png" trans="ff00ff" width="256" height="7199"/>
+  <image source="lab_tilemap_001.png" trans="FF00FF" width="256" height="7199"/>
   <tile id="44">
    <properties>
     <property name="Type" value="teste"/>
