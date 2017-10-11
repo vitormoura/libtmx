@@ -41,3 +41,7 @@ Saiba mais sobre a biblioteca gtest em [https://github.com/google/googletest](ht
 O diretório `samples` demonstra a utilização da biblioteca para carregar um mapa qualquer utilizando SDL. Para executá-lo, modifique os arquivos `.prop` para identificar a localização das bibliotecas do SDL (e do próprio libtmx) em seu computador, e copie as DLLs do SDL para o diretório de execução (geralmente Debug/x64 ou Debug/x86).
 
 Você pode obter as bibliotecas do SDL2 no [site oficial](https://www.libsdl.org/download-2.0.php), SDL_Image em [https://www.libsdl.org/projects/SDL_image/](https://www.libsdl.org/projects/SDL_image/) e a biblioteca `SDL2_gfx` em [https://sourceforge.net/projects/sdl2gfx/](https://sourceforge.net/projects/sdl2gfx/).
+
+### Preview da amostra
+
+![Screenshot](samples/libtmx_sdl/Screenshot_Sample.png)
