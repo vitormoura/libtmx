@@ -35,6 +35,12 @@
     <None Include="Assets\lab_map_001_invalid.tmx">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Assets\snf_tilemap.tmx">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Assets\snf_tileset.tsx">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="Assets\code-solid-circ.png">

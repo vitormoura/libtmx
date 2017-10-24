@@ -120,6 +120,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="animation_frame.h" />
     <ClInclude Include="color.h" />
     <ClInclude Include="enums.h" />
     <ClInclude Include="image_layer.h" />

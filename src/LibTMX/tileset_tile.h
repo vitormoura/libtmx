@@ -5,6 +5,7 @@
 #include <string>
 #include "custom_property.h"
 #include "object_group.h"
+#include "animation_frame.h"
 
 namespace tmxparser {
 
@@ -30,7 +31,9 @@ namespace tmxparser {
 		float probability;
 
 		//terrain
-		//animation
+		
+		//frames de animação
+		vector<animation_frame> animation;
 
 		tileset_tile() 
 			: probability(1.0f) {

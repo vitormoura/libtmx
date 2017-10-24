@@ -156,3 +156,50 @@ TEST(Tests_CargaArquivo, CargaArquivoValidoRetornaTrue) {
 	ASSERT_TRUE(map.tilesets.size() == 0);
 	
 }
+
+TEST(Tests_CargaArquivo, CargaArquivoTsxExternoValidoRetornaTrue) {
+
+	tmxparser::map<> map;
+
+	EXPECT_TRUE(map.load("./Assets/snf_tilemap.tmx"));
+
+	ASSERT_EQ(map.tilesets.size(), 1);
+
+	auto ts = map.tilesets[0];
+
+	ASSERT_EQ(ts->firstgid, 1);
+	ASSERT_STRCASEEQ(ts->name.c_str(), "snf_tileset");
+	ASSERT_EQ(ts->tile_width, 64);
+	ASSERT_EQ(ts->tile_height, 81);
+	ASSERT_EQ(ts->tile_count, 6);
+	ASSERT_EQ(ts->columns, 0);
+	ASSERT_EQ(ts->tile_offset.x, 0);
+	ASSERT_EQ(ts->tile_offset.y, 0);
+
+	ASSERT_TRUE(ts->tiles.size() == 6);
+
+	auto ts_0 = ts->tiles[1];
+
+	ASSERT_TRUE(ts_0 != nullptr);
+
+	ASSERT_EQ(ts_0->id, 1);
+	
+	ASSERT_TRUE(ts_0->image != nullptr);
+	ASSERT_EQ(ts_0->image->source, "./Assets/ranma_male/stand_0.png");
+	ASSERT_EQ(ts_0->image->width, 64);
+	ASSERT_EQ(ts_0->image->height, 79);
+
+	ASSERT_TRUE(ts_0->animation.size() == 3);
+
+	ASSERT_TRUE(ts_0->object_group != nullptr);
+	ASSERT_EQ(ts_0->object_group->draw_order, object_group::draworder::index);
+	ASSERT_EQ(ts_0->object_group->name, "");
+		
+	ASSERT_TRUE(ts_0->object_group->objects != nullptr);
+	ASSERT_EQ(ts_0->object_group->objects->size(), 1);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->id, 1);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->position.x, 28);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->position.y, 9);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->width, 18);
+	ASSERT_EQ(ts_0->object_group->objects->at(0)->height, 42);
+}

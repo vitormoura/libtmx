@@ -158,7 +158,46 @@ namespace tmxparser {
 					else if (is_name_equals(mapChildNode, "tileset")) {
 						auto t = make_shared<tileset>();
 
-						this->fill_tileset(mapChildNode, t);
+						//Vamos verificar se o tileset está presente em um arquivo externo
+						auto sourceAttr = mapChildNode->first_attribute("source");
+
+						if (sourceAttr == nullptr) {
+							this->fill_tileset(mapChildNode, t);
+						}
+						else {
+										
+							read_to(sourceAttr, t->source);
+
+							//Arquivo com detalhes sobre o tileset é externo
+							if (t->source.size() > 0) {
+								
+								//o firstgid ainda é regido pelo arquivo TMX
+								read_to(mapChildNode->first_attribute("firstgid"), &t->firstgid);
+								
+								//Aplicando prefixo do diretório onde o TMX está armazenado
+								t->source.insert(0, "/");
+								t->source.insert(0, this->file_path.first.c_str());
+																								
+								try {
+
+									xml_document<> docTSX;
+
+									unique_ptr<file<>> tsxFile(new file<>(t->source.c_str()));
+									docTSX.parse<0>(tsxFile->data());
+																		
+									auto tsNode = docTSX.first_node("tileset");
+
+									if (tsNode != nullptr) {
+										this->fill_tileset(tsNode, t);
+									}
+								}
+								catch (std::exception ex) {
+									error = ex.what();
+									return false;
+								}
+																
+							}
+						}
 
 						this->tilesets.push_back(t);
 					}
@@ -514,8 +553,10 @@ namespace tmxparser {
 		}
 
 		bool fill_tileset(xml_node<Ch>* node, shared_ptr<tileset> t) {
+				
+			xml_attribute<Ch>* attr = node->first_attribute();
 
-			for (xml_attribute<Ch>* attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
+			while (attr) {
 
 				if (is_name_equals(attr, "firstgid")) {
 					read_to(attr, &t->firstgid);
@@ -547,29 +588,32 @@ namespace tmxparser {
 				else if (is_name_equals(attr, "backgroundcolor")) {
 					read_to(attr, t->background_color);
 				}
+
+				attr = attr->next_attribute();
 			}
-
-			//Por padrão, o mesmo node recebido é o node para ler elementos extras, mas pode mudar se um arquivo externo for apontado
-			xml_node<Ch>* detailsNode = node;
-
-			//Arquivo com detalhes sobre o tileset é externo
-			if (t->source.size() > 0) {
-				//TODO
-			}
-
+			
 			//Criando o conjunto padrão de tiles deste tileset
 			for (size_t id = t->firstgid, i = 0; i < t->tile_count; id++, i++)
 			{
-				auto line = (i / t->columns);
-
 				t->tiles[id] = make_shared<tileset_tile>();
-
 				t->tiles[id]->id = id; //global ID
-				t->tiles[id]->position.x = t->spacing + (t->tile_width * i) - (line * t->tile_width * t->columns);
-				t->tiles[id]->position.y = t->spacing + (line * t->tile_height);
-			}
 
-			xml_node<Ch>* currentNode = detailsNode->first_node();
+				//Nem sempre o tileset descreve a quantidade de colunas, geralmente isso ocorre quando esse tileset é formado por imagens individuais
+				if (t->columns > 0) {
+
+					auto line = (i / t->columns);
+
+					t->tiles[id]->position.x = t->spacing + (t->tile_width * i) - (line * t->tile_width * t->columns);
+					t->tiles[id]->position.y = t->spacing + (line * t->tile_height);
+				}
+				else {
+					t->tiles[id]->position.x = t->spacing;
+					t->tiles[id]->position.y = t->spacing;
+				}
+			}
+						
+
+			xml_node<Ch>* currentNode = node->first_node();
 
 			do
 			{
@@ -593,10 +637,14 @@ namespace tmxparser {
 
 					this->fill_tile(currentNode, tempTile);
 
-					//O identificador do tile alimentado é um identificador local, devemos complementar seu ID com o 
-					//firstgid do tileset
+					//O identificador do tile alimentado é um identificador local, devemos complementar seu ID com o firstgid do tileset
 					tempTile->id = tempTile->id + t->firstgid;
 					tempTile->position = t->tiles[tempTile->id]->position;
+
+					//Será preciso atualizar também o identificador de tile do frame de animação levando em consideração o firstgid do tileset
+					for (auto& af : tempTile->animation) {
+						af.tileid = t->firstgid + af.tileid;
+					}
 
 					t->tiles[tempTile->id] = tempTile;
 				}
@@ -750,19 +798,42 @@ namespace tmxparser {
 
 			read_to(tileNode->first_attribute("id"), &tile->id);
 
-			auto propsNode = tileNode->first_node("properties");
-
 			tile->probability = 1.0f;
 
-			if (propsNode != nullptr) {
-				this->fill_properties(propsNode, tile->properties);
-			}
+			xml_node<Ch>* currNode = tileNode->first_node();
 
-			auto objgrpNode = tileNode->first_node("objectgroup");
+			while (currNode) {
 
-			if (objgrpNode != nullptr) {
-				tile->object_group = make_shared<object_group>();
-				this->fill_objectgroup(objgrpNode, tile->object_group);
+				if (is_name_equals(currNode, "properties")) {
+					this->fill_properties(currNode, tile->properties);
+				}
+				else if (is_name_equals(currNode, "objectgroup")) {
+					tile->object_group = make_shared<object_group>();
+					this->fill_objectgroup(currNode, tile->object_group);
+				}
+				else if (is_name_equals(currNode, "image")) {
+					tile->image = make_shared<tileset_image>();
+					this->fill_image(currNode, tile->image);
+				}
+				else if (is_name_equals(currNode, "animation")) {
+
+					xml_node<Ch>* frameNode = currNode->first_node();
+
+					while (frameNode != nullptr) {
+
+						animation_frame af{};
+
+						read_to(frameNode->first_attribute("tileid"), &af.tileid);
+						read_to(frameNode->first_attribute("duration"), &af.duration);
+
+						tile->animation.push_back(af);
+
+						frameNode = frameNode->next_sibling();
+					}
+				}
+
+				
+				currNode = currNode->next_sibling();
 			}
 		}
 
